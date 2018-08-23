@@ -50,6 +50,7 @@ elseif(CMAKE_SIZEOF_VOID_P MATCHES "4")
 else(CMAKE_SIZEOF_VOID_P MATCHES "8")
     message(FATAL_ERROR "unable to detect platform")
 endif (CMAKE_SIZEOF_VOID_P MATCHES "8")
+message(${VICON_SDK_LINK_DIR})
 find_library(VICON_SDK_LIBRARY ViconDataStreamSDK_CPP PATHS ${VICON_SDK_LINK_DIR})
 
 include_directories(src ${catkin_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS} ${VICON_SDK_INCLUDE_DIR})
@@ -63,12 +64,22 @@ target_link_libraries(vicon_bridge
     ${catkin_LIBRARIES}
 )
 add_dependencies(vicon_bridge ${PROJECT_NAME}_gencpp)
+install(TARGETS vicon_bridge
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+install(TARGETS msvc_bridge
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
 
 add_executable(calibrate src/calibrate_segment.cpp)
 target_link_libraries(calibrate
    ${catkin_LIBRARIES}
 )
 add_dependencies(calibrate ${PROJECT_NAME}_gencpp)
+install(TARGETS calibrate
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
 add_executable(tf_distort src/tf_distort.cpp)
 target_link_libraries(tf_distort
@@ -76,9 +87,20 @@ target_link_libraries(tf_distort
    ${Boost_LIBRARIES}
 )
 add_dependencies(tf_distort ${PROJECT_NAME}_gencpp ${PROJECT_NAME}_gencfg)
+install(TARGETS tf_distort
+  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
 
-add_executable(testclient src/ViconDataStreamSDK_CPPTest.cpp)
-target_link_libraries(testclient 
-    ${VICON_SDK_LIBRARY}
-    ${Boost_LIBRARIES}
+#add_executable(testclient src/ViconDataStreamSDK_CPPTest.cpp)
+#target_link_libraries(testclient 
+#    ${VICON_SDK_LIBRARY}
+#    ${Boost_LIBRARIES}
+#)
+#install(TARGETS testclient
+#  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+#)
+
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+  PATTERN ".svn" EXCLUDE
 )
